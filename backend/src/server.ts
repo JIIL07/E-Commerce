@@ -9,6 +9,7 @@ import authRouter from './routes/auth'
 import cartRouter from './routes/cart'
 import ordersRouter from './routes/orders'
 import reviewsRouter from './routes/reviews'
+import paymentsRouter from './routes/payments'
 
 dotenv.config()
 
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
       cart: '/api/cart',
       orders: '/api/orders',
       reviews: '/api/reviews',
+      payments: '/api/payments',
       health: '/api/health'
     }
   })
@@ -55,6 +57,7 @@ app.use('/api/categories', categoriesRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/orders', ordersRouter)
 app.use('/api/reviews', reviewsRouter)
+app.use('/api/payments', paymentsRouter)
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack)
@@ -80,4 +83,5 @@ app.listen(PORT, () => {
   console.log(`🛒 Cart API: http://localhost:${PORT}/api/cart`)
   console.log(`📦 Orders API: http://localhost:${PORT}/api/orders`)
   console.log(`⭐ Reviews API: http://localhost:${PORT}/api/reviews`)
+  console.log(`💳 Payments API: http://localhost:${PORT}/api/payments`)
 })
