@@ -6,17 +6,14 @@ import { authenticateToken, AuthRequest } from '../middleware/auth'
 
 const router = Router()
 
-// POST /api/auth/register - Register new user
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' })
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     })
@@ -25,10 +22,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' })
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         email,
@@ -44,7 +39,6 @@ router.post('/register', async (req, res) => {
       }
     })
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET || 'fallback-secret',
@@ -62,17 +56,14 @@ router.post('/register', async (req, res) => {
   }
 })
 
-// POST /api/auth/login - Login user
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' })
     }
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email }
     })
@@ -81,14 +72,12 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' })
     }
 
-    // Check password
     const isValidPassword = await bcrypt.compare(password, user.password || '')
 
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' })
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET || 'fallback-secret',
@@ -112,7 +101,6 @@ router.post('/login', async (req, res) => {
   }
 })
 
-// GET /api/auth/me - Get current user
 router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -138,7 +126,6 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
   }
 })
 
-// PUT /api/auth/profile - Update user profile
 router.put('/profile', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const { name, image } = req.body
@@ -168,7 +155,6 @@ router.put('/profile', authenticateToken, async (req: AuthRequest, res) => {
   }
 })
 
-// POST /api/auth/change-password - Change password
 router.post('/change-password', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const { currentPassword, newPassword } = req.body
@@ -177,7 +163,6 @@ router.post('/change-password', authenticateToken, async (req: AuthRequest, res)
       return res.status(400).json({ message: 'Current password and new password are required' })
     }
 
-    // Get user with password
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id }
     })
@@ -186,17 +171,14 @@ router.post('/change-password', authenticateToken, async (req: AuthRequest, res)
       return res.status(404).json({ message: 'User not found' })
     }
 
-    // Verify current password
     const isValidPassword = await bcrypt.compare(currentPassword, user.password || '')
 
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Current password is incorrect' })
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 12)
 
-    // Update password
     await prisma.user.update({
       where: { id: req.user!.id },
       data: { password: hashedPassword }

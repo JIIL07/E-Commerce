@@ -5,7 +5,6 @@ import { ProductWithRating, CategoryWithProducts } from '../types'
 
 const router = Router()
 
-// GET /api/categories - Get all categories
 router.get('/', async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
@@ -24,7 +23,6 @@ router.get('/', async (req, res) => {
   }
 })
 
-// GET /api/categories/:slug - Get single category with products
 router.get('/:slug', async (req, res) => {
   try {
     const category = await prisma.category.findUnique({
@@ -47,7 +45,6 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).json({ message: 'Category not found' })
     }
 
-    // Calculate average rating for each product
     const productsWithRating: ProductWithRating[] = category.products.map((product: any) => ({
       ...product,
       averageRating: product.reviews.length > 0 
@@ -66,12 +63,10 @@ router.get('/:slug', async (req, res) => {
   }
 })
 
-// POST /api/categories - Create new category (Admin only)
 router.post('/', authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
   try {
     const { name, description, image } = req.body
 
-    // Generate slug from name
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
     const category = await prisma.category.create({
@@ -90,7 +85,6 @@ router.post('/', authenticateToken, requireAdmin, async (req: AuthRequest, res) 
   }
 })
 
-// PUT /api/categories/:id - Update category (Admin only)
 router.put('/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
   try {
     const { name, description, image } = req.body
@@ -117,10 +111,8 @@ router.put('/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res
   }
 })
 
-// DELETE /api/categories/:id - Delete category (Admin only)
 router.delete('/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
   try {
-    // Check if category has products
     const productCount = await prisma.product.count({
       where: { categoryId: req.params.id }
     })

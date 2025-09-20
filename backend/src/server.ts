@@ -6,14 +6,15 @@ import dotenv from 'dotenv'
 import productsRouter from './routes/products'
 import categoriesRouter from './routes/categories'
 import authRouter from './routes/auth'
+import cartRouter from './routes/cart'
+import ordersRouter from './routes/orders'
+import reviewsRouter from './routes/reviews'
 
-// Load environment variables
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
 
-// Middleware
 app.use(helmet())
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -23,7 +24,6 @@ app.use(morgan('combined'))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// Routes
 app.get('/', (req, res) => {
   res.json({
     message: 'E-Commerce API Server',
@@ -33,6 +33,9 @@ app.get('/', (req, res) => {
       products: '/api/products',
       categories: '/api/categories',
       auth: '/api/auth',
+      cart: '/api/cart',
+      orders: '/api/orders',
+      reviews: '/api/reviews',
       health: '/api/health'
     }
   })
@@ -46,12 +49,13 @@ app.get('/api/health', (req, res) => {
   })
 })
 
-// API Routes
 app.use('/api/auth', authRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/categories', categoriesRouter)
+app.use('/api/cart', cartRouter)
+app.use('/api/orders', ordersRouter)
+app.use('/api/reviews', reviewsRouter)
 
-// Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack)
   res.status(500).json({
@@ -60,7 +64,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   })
 })
 
-// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
     message: 'Route not found',
@@ -74,4 +77,7 @@ app.listen(PORT, () => {
   console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`)
   console.log(`🛍️  Products API: http://localhost:${PORT}/api/products`)
   console.log(`📂 Categories API: http://localhost:${PORT}/api/categories`)
+  console.log(`🛒 Cart API: http://localhost:${PORT}/api/cart`)
+  console.log(`📦 Orders API: http://localhost:${PORT}/api/orders`)
+  console.log(`⭐ Reviews API: http://localhost:${PORT}/api/reviews`)
 })

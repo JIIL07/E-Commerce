@@ -5,7 +5,6 @@ import { ProductWithRating, ProductWithCategory } from '../types'
 
 const router = Router()
 
-// GET /api/products - Get all products with pagination and filters
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1
@@ -53,7 +52,6 @@ router.get('/', async (req, res) => {
       prisma.product.count({ where })
     ])
 
-    // Calculate average rating for each product
     const productsWithRating: ProductWithRating[] = products.map((product: any) => ({
       ...product,
       averageRating: product.reviews.length > 0 
@@ -77,7 +75,6 @@ router.get('/', async (req, res) => {
   }
 })
 
-// GET /api/products/:id - Get single product
 router.get('/:id', async (req, res) => {
   try {
     const product = await prisma.product.findUnique({
@@ -114,12 +111,10 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-// POST /api/products - Create new product (Admin only)
 router.post('/', authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
   try {
     const { name, description, price, comparePrice, images, categoryId, stock, featured } = req.body
 
-    // Generate slug from name
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
     const product = await prisma.product.create({
@@ -146,7 +141,6 @@ router.post('/', authenticateToken, requireAdmin, async (req: AuthRequest, res) 
   }
 })
 
-// PUT /api/products/:id - Update product (Admin only)
 router.put('/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
   try {
     const { name, description, price, comparePrice, images, categoryId, stock, featured, inStock } = req.body
@@ -182,7 +176,6 @@ router.put('/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res
   }
 })
 
-// DELETE /api/products/:id - Delete product (Admin only)
 router.delete('/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
   try {
     await prisma.product.delete({
