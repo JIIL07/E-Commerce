@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { ShoppingCart, User, LogOut } from 'lucide-react'
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -22,7 +23,8 @@ export default function Navbar() {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -30,26 +32,35 @@ export default function Navbar() {
       if (response.ok) {
         const userData = await response.json()
         setUser(userData)
+      } else {
+        localStorage.removeItem('token')
+        setIsLoggedIn(false)
       }
     } catch (error) {
       console.error('Error fetching user:', error)
+      localStorage.removeItem('token')
+      setIsLoggedIn(false)
     }
   }
 
   const fetchCartCount = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/cart`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
       if (response.ok) {
         const cartData = await response.json()
-        setCartCount(cartData.items.length)
+        setCartCount(cartData.items?.length || 0)
+      } else {
+        setCartCount(0)
       }
     } catch (error) {
       console.error('Error fetching cart:', error)
+      setCartCount(0)
     }
   }
 
@@ -68,7 +79,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">🛒</span>
+                <ShoppingCart className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">E-Commerce</span>
             </Link>
@@ -98,7 +109,7 @@ export default function Navbar() {
               <>
                 <Link href="/cart" className="relative">
                   <div className="w-8 h-8 flex items-center justify-center">
-                    <span className="text-2xl">🛒</span>
+                    <ShoppingCart className="w-6 h-6 text-gray-700" />
                     {cartCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                         {cartCount}
@@ -114,8 +125,9 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
+                      <LogOut className="w-4 h-4 mr-2" />
                       Logout
                     </button>
                   </div>

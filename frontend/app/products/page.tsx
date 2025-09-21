@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
+import { Star, ShoppingCart } from 'lucide-react'
 
 interface Product {
   id: string
@@ -41,14 +42,21 @@ export default function ProductsPage() {
         sortBy
       })
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?${params}`)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${apiUrl}/api/products?${params}`)
       if (response.ok) {
         const data = await response.json()
-        setProducts(data.products)
-        setTotalPages(data.pagination.pages)
+        setProducts(data.products || [])
+        setTotalPages(data.pagination?.pages || 1)
+      } else {
+        console.error('Failed to fetch products:', response.status)
+        setProducts([])
+        setTotalPages(1)
       }
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([])
+      setTotalPages(1)
     } finally {
       setLoading(false)
     }
@@ -131,9 +139,11 @@ export default function ProductsPage() {
                           alt={product.name}
                           className="w-full h-full object-cover"
                         />
-                      ) : (
-                        <span className="text-gray-400 text-4xl">📦</span>
-                      )}
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ShoppingCart className="w-16 h-16 text-gray-400" />
+                          </div>
+                        )}
                       {!product.inStock && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                           <span className="text-white font-semibold">Out of Stock</span>
@@ -145,11 +155,13 @@ export default function ProductsPage() {
                       <p className="text-sm text-gray-600 mb-2">{product.category.name}</p>
                       <div className="flex items-center mb-2">
                         <div className="flex text-yellow-400">
-                          {[...Array(5)].map((_, i) => (
-                            <span key={i} className={i < Math.floor(product.averageRating) ? 'text-yellow-400' : 'text-gray-300'}>
-                              ★
-                            </span>
-                          ))}
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                size={16}
+                                className={i < Math.floor(product.averageRating) ? 'fill-current text-yellow-400' : 'text-gray-300'}
+                              />
+                            ))}
                         </div>
                         <span className="text-sm text-gray-600 ml-2">({product.reviewCount})</span>
                       </div>

@@ -19,7 +19,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -32,6 +32,7 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem('token', data.token)
         router.push('/')
+        router.refresh()
       } else {
         setError(data.message || 'Login failed')
       }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
+import { ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react'
 
 interface CartItem {
   id: string
@@ -35,7 +36,7 @@ export default function CartPage() {
         return
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/cart`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -59,7 +60,7 @@ export default function CartPage() {
       setUpdating(itemId)
       const token = localStorage.getItem('token')
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${itemId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/cart/${itemId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ export default function CartPage() {
       setUpdating(itemId)
       const token = localStorage.getItem('token')
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${itemId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/cart/${itemId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -104,7 +105,7 @@ export default function CartPage() {
     try {
       const token = localStorage.getItem('token')
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/clear`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/cart/clear`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -150,7 +151,9 @@ export default function CartPage() {
 
         {cartItems.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🛒</div>
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ShoppingCart className="w-12 h-12 text-gray-400" />
+            </div>
             <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
             <p className="text-gray-600 mb-8">Add some products to get started!</p>
             <Link href="/products" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
@@ -185,7 +188,7 @@ export default function CartPage() {
                               className="w-full h-full object-cover rounded-lg"
                             />
                           ) : (
-                            <span className="text-gray-400 text-2xl">📦</span>
+                            <ShoppingCart className="w-8 h-8 text-gray-400" />
                           )}
                         </div>
                         
@@ -201,7 +204,7 @@ export default function CartPage() {
                             disabled={updating === item.id || item.quantity <= 1}
                             className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
                           >
-                            -
+                            <Minus className="w-4 h-4" />
                           </button>
                           <span className="w-8 text-center">{item.quantity}</span>
                           <button
@@ -209,7 +212,7 @@ export default function CartPage() {
                             disabled={updating === item.id || item.quantity >= item.product.stock}
                             className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
                           >
-                            +
+                            <Plus className="w-4 h-4" />
                           </button>
                         </div>
                         
@@ -220,8 +223,9 @@ export default function CartPage() {
                           <button
                             onClick={() => removeItem(item.id)}
                             disabled={updating === item.id}
-                            className="text-red-600 hover:text-red-700 text-sm mt-1"
+                            className="text-red-600 hover:text-red-700 text-sm mt-1 flex items-center"
                           >
+                            <Trash2 className="w-4 h-4 mr-1" />
                             Remove
                           </button>
                         </div>

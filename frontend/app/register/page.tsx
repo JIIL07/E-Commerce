@@ -27,7 +27,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -44,6 +44,7 @@ export default function RegisterPage() {
       if (response.ok) {
         localStorage.setItem('token', data.token)
         router.push('/')
+        router.refresh()
       } else {
         setError(data.message || 'Registration failed')
       }
