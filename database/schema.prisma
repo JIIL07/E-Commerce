@@ -21,9 +21,10 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  orders    Order[]
-  reviews   Review[]
-  cartItems CartItem[]
+  orders       Order[]
+  reviews      Review[]
+  cartItems    CartItem[]
+  wishlistItems WishlistItem[]
 
   @@map("users")
 }
@@ -59,10 +60,11 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
-  reviews    Review[]
-  cartItems  CartItem[]
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems    OrderItem[]
+  reviews       Review[]
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
 
   @@map("products")
 }
@@ -136,6 +138,19 @@ model CartItem {
 enum Role {
   USER
   ADMIN
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  addedAt   DateTime @default(now())
+  
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, productId])
+  @@map("wishlist_items")
 }
 
 enum OrderStatus {
