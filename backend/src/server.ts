@@ -10,6 +10,7 @@ import cartRouter from './routes/cart'
 import ordersRouter from './routes/orders'
 import reviewsRouter from './routes/reviews'
 import paymentsRouter from './routes/payments'
+import wishlistRouter from './routes/wishlist'
 
 dotenv.config()
 
@@ -58,6 +59,7 @@ app.use('/api/cart', cartRouter)
 app.use('/api/orders', ordersRouter)
 app.use('/api/reviews', reviewsRouter)
 app.use('/api/payments', paymentsRouter)
+app.use('/api/wishlist', wishlistRouter)
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack)
