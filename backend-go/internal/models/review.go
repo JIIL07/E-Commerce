@@ -16,21 +16,19 @@ type Review struct {
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// ReviewWithUser represents a review with user information
 type ReviewWithUser struct {
 	Review
-	User *UserResponse `json:"user,omitempty"`
+	UserName  string  `json:"user_name"`
+	UserImage *string `json:"user_image"`
 }
 
-// ReviewCreateRequest represents the request to create a new review
 type ReviewCreateRequest struct {
-	ProductID string  `json:"product_id" binding:"required"`
-	Rating    int     `json:"rating" binding:"required,min=1,max=5"`
-	Comment   string  `json:"comment" binding:"required"`
-	Helpful   *bool   `json:"helpful"`
+	ProductID string `json:"product_id" binding:"required"`
+	Rating    int    `json:"rating" binding:"required,min=1,max=5"`
+	Comment   string `json:"comment" binding:"required"`
+	Helpful   *bool  `json:"helpful"`
 }
 
-// ReviewUpdateRequest represents the request to update a review
 type ReviewUpdateRequest struct {
 	Rating  *int    `json:"rating"`
 	Comment *string `json:"comment"`

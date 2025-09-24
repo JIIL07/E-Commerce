@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// OrderStatus represents the status of an order
 type OrderStatus string
 
 const (
@@ -15,7 +14,6 @@ const (
 	OrderStatusCancelled  OrderStatus = "cancelled"
 )
 
-// Order represents an order in the system
 type Order struct {
 	ID              string      `json:"id" db:"id"`
 	UserID          string      `json:"user_id" db:"user_id"`
@@ -31,7 +29,6 @@ type Order struct {
 	UpdatedAt       time.Time   `json:"updated_at" db:"updated_at"`
 }
 
-// OrderItem represents an item in an order
 type OrderItem struct {
 	ID        string  `json:"id" db:"id"`
 	OrderID   string  `json:"order_id" db:"order_id"`
@@ -40,26 +37,22 @@ type OrderItem struct {
 	Price     float64 `json:"price" db:"price"`
 }
 
-// OrderWithItems represents an order with its items
 type OrderWithItems struct {
 	Order
 	User      *UserResponse      `json:"user,omitempty"`
 	OrderItems []OrderItemWithProduct `json:"order_items,omitempty"`
 }
 
-// OrderItemWithProduct represents an order item with product information
 type OrderItemWithProduct struct {
 	OrderItem
 	Product *ProductWithRating `json:"product,omitempty"`
 }
 
-// OrderCreateRequest represents the request to create a new order
 type OrderCreateRequest struct {
 	ShippingAddress string `json:"shipping_address" binding:"required"`
 	BillingAddress  string `json:"billing_address" binding:"required"`
 }
 
-// OrderUpdateRequest represents the request to update an order
 type OrderUpdateRequest struct {
 	Status *OrderStatus `json:"status"`
 }
