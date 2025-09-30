@@ -6,8 +6,8 @@ services:
     container_name: ecommerce-postgres
     environment:
       POSTGRES_DB: ${DB_NAME:-ecommerce}
-      POSTGRES_USER: ${DB_USER:-jiil}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-juice}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -48,17 +48,17 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USER: ${DB_USER:-jiil}
-      DB_PASSWORD: ${DB_PASSWORD:-juice}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME:-ecommerce}
       DB_SSLMODE: disable
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       FRONTEND_URL: http://frontend:3000
       GIN_MODE: ${GIN_MODE:-debug}
     ports:
