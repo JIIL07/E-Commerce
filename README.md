@@ -261,46 +261,6 @@ make generate-images
 ```bash
 docker compose up -d
 ```
-
----
-
-## 🔧 Troubleshooting
-
-### **Common Issues & Solutions**
-
-#### **Products showing without images**
-```bash
-# Solution: Generate placeholder images
-make generate-images
-```
-
-#### **Database connection issues**
-```bash
-# Check if PostgreSQL is running
-docker-compose ps postgres
-
-# Restart database
-docker-compose restart postgres
-```
-
-#### **WebSocket not working**
-```bash
-# Check WebSocket endpoint
-curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" http://localhost:5000/ws
-```
-
-#### **Frontend not loading**
-```bash
-# Rebuild frontend
-make build
-docker-compose restart frontend
-```
-
-### **Getting Help**
-- Check the [ULTIMATE_GUIDE.md](ULTIMATE_GUIDE.md) for detailed documentation
-- Review logs: `make logs`
-- Check service health: `make health`
-
 ---
 
 ## 🤝 Support & Community
@@ -309,12 +269,9 @@ docker-compose restart frontend
 - **GitHub Issues** for bugs and suggestions
 
 ### 📚 **Documentation**
-- **[ULTIMATE_GUIDE.md](ULTIMATE_GUIDE.md)** - Complete developer guide
 - **API Documentation** - Swagger UI available at `/docs`
-- **Code Documentation** - detailed comments in code
 - **Database Schema** - migrations in `migrations/` folder
 - **Image System** - upload, storage, and placeholder handling
-
 ---
 
 **⭐ Give us a star if you like the project!**
