@@ -10,6 +10,7 @@
 ![Template](https://img.shields.io/badge/Template-For_Developers-green?style=for-the-badge&logo=code)
 
 **Complete E-Commerce - ready-to-customize template for developers**
+
 [![Documentation](https://img.shields.io/badge/📚_Documentation-Read_More-blue?style=for-the-badge)](#-documentation)
 [![Get Started](https://img.shields.io/badge/⚡_Get_Started-5_Minutes-orange?style=for-the-badge)](#quick-start)
 
