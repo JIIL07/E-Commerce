@@ -1,4 +1,4 @@
-package websocket
+﻿package websocket
 
 import (
 	"encoding/json"
@@ -6,75 +6,82 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
+const (
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
+	maxMessageSize = 512
+)
+
 var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-type Message struct {
-	Type    string      `json:"type"`
-	Data    interface{} `json:"data"`
-	UserID  string      `json:"user_id,omitempty"`
-	Role    string      `json:"role,omitempty"`
 }
 
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
+		c.Hub.unregister <- c
+		c.Conn.Close()
 	}()
 
-	c.conn.SetReadLimit(512)
-	c.conn.SetReadDeadline(time.Now().Add(60 * time.Second))
-	c.conn.SetPongHandler(func(string) error {
-		c.conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	c.Conn.SetReadLimit(maxMessageSize)
+	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.Conn.SetPongHandler(func(string) error {
+		c.Conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})
 
 	for {
-		_, _, err := c.conn.ReadMessage()
+		_, messageBytes, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("WebSocket error: %v", err)
 			}
 			break
 		}
+
+		var message Message
+		if err := json.Unmarshal(messageBytes, &message); err != nil {
+			log.Printf("Error unmarshaling message: %v", err)
+			continue
+		}
+
+		c.handleMessage(&message)
 	}
 }
 
 func (c *Client) writePump() {
-	ticker := time.NewTicker(54 * time.Second)
+	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.conn.Close()
+		c.Conn.Close()
 	}()
 
 	for {
 		select {
-		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+		case message, ok := <-c.Send:
+			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
+			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
 			w.Write(message)
 
-			n := len(c.send)
+			n := len(c.Send)
 			for i := 0; i < n; i++ {
 				w.Write([]byte{'\n'})
-				w.Write(<-c.send)
+				w.Write(<-c.Send)
 			}
 
 			if err := w.Close(); err != nil {
@@ -82,79 +89,94 @@ func (c *Client) writePump() {
 			}
 
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}
 	}
 }
 
-func HandleWebSocket(hub *Hub) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			log.Printf("WebSocket upgrade error: %v", err)
-			return
-		}
-
-		userID := c.GetString("user_id")
-		userRole := c.GetString("user_role")
-
-		client := &Client{
-			hub:      hub,
-			conn:     conn,
-			send:     make(chan []byte, 256),
-			userID:   userID,
-			userRole: userRole,
-		}
-
-		client.hub.register <- client
-
-		go client.writePump()
-		go client.readPump()
-
-		welcomeMessage := Message{
-			Type: "welcome",
-			Data: map[string]interface{}{
-				"message": "Connected to E-Commerce WebSocket",
-				"user_id": userID,
-			},
-		}
-
-		messageBytes, _ := json.Marshal(welcomeMessage)
-		client.send <- messageBytes
+func (c *Client) handleMessage(message *Message) {
+	switch message.Type {
+	case MessageTypePing:
+		c.handlePing()
+	case MessageTypeNotification:
+		c.handleChatMessage(message)
+	case MessageTypeUserActivity:
+		c.handleJoinRoom(message)
+	default:
+		log.Printf("Unknown message type: %s", message.Type)
 	}
 }
 
-func BroadcastOrderUpdate(hub *Hub, userID string, orderData interface{}) {
-	message := Message{
-		Type:   "order_update",
-		Data:   orderData,
-		UserID: userID,
-	}
+func (c *Client) handlePing() {
+	pongMsg := CreateMessage(MessageTypePong, map[string]interface{}{
+		"timestamp": time.Now().Unix(),
+	}, c.UserID)
 
-	messageBytes, _ := json.Marshal(message)
-	hub.BroadcastToUser(userID, messageBytes)
+	data, _ := pongMsg.ToJSON()
+	select {
+	case c.Send <- data:
+	default:
+		close(c.Send)
+	}
 }
 
-func BroadcastProductUpdate(hub *Hub, productData interface{}) {
-	message := Message{
-		Type: "product_update",
-		Data: productData,
+func (c *Client) handleChatMessage(message *Message) {
+	if c.UserID == "" {
+		return
 	}
 
-	messageBytes, _ := json.Marshal(message)
-	hub.broadcast <- messageBytes
+	chatData, ok := message.Data.(map[string]interface{})
+	if !ok {
+		return
+	}
+
+	chatMessage, _ := chatData["message"].(string)
+	roomID, _ := chatData["room_id"].(string)
+
+	if roomID == "" {
+		return
+	}
+
+	if chatMessage == "" {
+		return
+	}
+
+	chatMsg := CreateMessage(MessageTypeNotification, NotificationData{
+		Title:   "Chat Message",
+		Message: chatMessage,
+		Icon:    "chat",
+	}, c.UserID)
+
+	c.Hub.Broadcast(chatMsg)
 }
 
-func BroadcastAdminNotification(hub *Hub, notification interface{}) {
-	message := Message{
-		Type: "admin_notification",
-		Data: notification,
-		Role: "admin",
+func (c *Client) handleJoinRoom(message *Message) {
+	roomData, ok := message.Data.(map[string]interface{})
+	if !ok {
+		return
 	}
 
-	messageBytes, _ := json.Marshal(message)
-	hub.BroadcastToRole("admin", messageBytes)
+	roomID, _ := roomData["room_id"].(string)
+	if roomID == "" {
+		return
+	}
+
+	joinMsg := CreateMessage(MessageTypeUserActivity, UserActivityData{
+		UserID:   c.UserID,
+		Activity: "joined_room",
+		Details:  roomID,
+	}, c.UserID)
+
+	c.Hub.Broadcast(joinMsg)
+}
+
+func (c *Client) ReadPump() {
+	c.readPump()
+}
+
+func (c *Client) WritePump() {
+	c.writePump()
 }

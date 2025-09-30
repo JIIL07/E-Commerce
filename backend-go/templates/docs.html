@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #666;
+            margin-top: 25px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: black; }
+        .delete { background: #dc3545; color: white; }
+        .head { background: #6c757d; color: white; }
+        .path {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #333;
+        }
+        .description {
+            color: #666;
+            margin-top: 5px;
+        }
+        .example {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .healthy { background: #d4edda; color: #155724; }
+        .params {
+            margin-top: 10px;
+        }
+        .param {
+            margin: 5px 0;
+            padding: 5px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .param-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .param-type {
+            color: #666;
+            font-size: 12px;
+        }
+        .param-desc {
+            color: #666;
+            font-size: 13px;
+        }
+        .response {
+            margin-top: 10px;
+        }
+        .response-code {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .auth-required {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 5px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            color: #856404;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{.title}}</h1>
+        
+        <div class="status healthy">API Status: Healthy</div>
+        <p>Welcome to the E-Commerce API documentation. This comprehensive API provides endpoints for managing products, categories, users, orders, payments, reviews, and more.</p>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#base-url">Base URL & Authentication</a></li>
+                <li><a href="#health">Health & Monitoring</a></li>
+                <li><a href="#auth">Authentication</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#categories">Categories</a></li>
+                <li><a href="#cart">Shopping Cart</a></li>
+                <li><a href="#orders">Orders</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#payments">Payments</a></li>
+                <li><a href="#wishlist">Wishlist</a></li>
+                <li><a href="#uploads">File Uploads</a></li>
+                <li><a href="#websocket">WebSocket</a></li>
+                <li><a href="#admin">Admin Panel</a></li>
+                <li><a href="#response-format">Response Format</a></li>
+                <li><a href="#error-handling">Error Handling</a></li>
+            </ul>
+        </div>
+
+        <h2 id="base-url">Base URL & Authentication</h2>
+        <div class="example">Base URL: http://localhost:5000</div>
+        <p>Most endpoints require authentication. Include the JWT token in the Authorization header:</p>
+        <div class="example">Authorization: Bearer &lt;your-jwt-token&gt;</div>
+
+        <h2 id="health">Health & Monitoring</h2>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/health</span>
+            <div class="description">Check API health status, uptime, and metrics</div>
+            <div class="response">
+                <div class="response-code">200 OK</div>
+                <div class="example">{
+  "status": "healthy",
+  "timestamp": "2025-09-30T11:13:37Z",
+  "uptime": "2h30m15s",
+  "metrics": {
+    "request_count": 1500,
+    "active_requests": 5,
+    "error_count": 10,
+    "avg_response_time": "150ms"
+  }
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method head">HEAD</span>
+            <span class="path">/api/health</span>
+            <div class="description">Quick health check (returns only status code)</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/metrics</span>
+            <div class="description">Get Prometheus-format metrics</div>
+            <div class="example"># HELP http_requests_total Total number of HTTP requests
+# TYPE http_requests_total counter
+http_requests_total 1500</div>
+        </div>
+
+        <h2 id="auth">Authentication</h2>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/auth/register</span>
+            <div class="description">Register a new user account</div>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">name</span> <span class="param-type">(string, required)</span>
+                    <div class="param-desc">User's full name</div>
+                </div>
+                <div class="param">
+                    <span class="param-name">email</span> <span class="param-type">(string, required)</span>
+                    <div class="param-desc">Valid email address</div>
+                </div>
+                <div class="param">
+                    <span class="param-name">password</span> <span class="param-type">(string, required)</span>
+                    <div class="param-desc">Password (min 6 characters)</div>
+                </div>
+            </div>
+            <div class="example">POST /api/auth/register
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}</div>
+            <div class="response">
+                <div class="response-code">201 Created</div>
+                <div class="example">{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "uuid",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "user"
+    },
+    "token": "jwt-token"
+  }
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/auth/login</span>
+            <div class="description">Login user and get JWT token</div>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">email</span> <span class="param-type">(string, required)</span>
+                </div>
+                <div class="param">
+                    <span class="param-name">password</span> <span class="param-type">(string, required)</span>
+                </div>
+            </div>
+            <div class="example">POST /api/auth/login
+{
+  "email": "john@example.com",
+  "password": "password123"
+}</div>
+            <div class="response">
+                <div class="response-code">200 OK</div>
+                <div class="example">{
+  "success": true,
+  "data": {
+    "user": { ... },
+    "token": "jwt-token",
+    "refresh_token": "refresh-token"
+  }
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/auth/profile</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get current user profile</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <span class="path">/api/auth/profile</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Update user profile</div>
+        </div>
+
+        <h2 id="products">Products</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/products</span>
+            <div class="description">Get all products with optional filtering and pagination</div>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">category</span> <span class="param-type">(string, optional)</span>
+                    <div class="param-desc">Filter by category slug</div>
+                </div>
+                <div class="param">
+                    <span class="param-name">search</span> <span class="param-type">(string, optional)</span>
+                    <div class="param-desc">Search in product name and description</div>
+                </div>
+                <div class="param">
+                    <span class="param-name">min_price</span> <span class="param-type">(number, optional)</span>
+                </div>
+                <div class="param">
+                    <span class="param-name">max_price</span> <span class="param-type">(number, optional)</span>
+                </div>
+                <div class="param">
+                    <span class="param-name">page</span> <span class="param-type">(number, optional)</span>
+                    <div class="param-desc">Page number (default: 1)</div>
+                </div>
+                <div class="param">
+                    <span class="param-name">limit</span> <span class="param-type">(number, optional)</span>
+                    <div class="param-desc">Items per page (default: 10, max: 100)</div>
+                </div>
+            </div>
+            <div class="example">GET /api/products?category=electronics&search=phone&min_price=100&max_price=1000&page=1&limit=20</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/products/featured</span>
+            <div class="description">Get featured products</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/products/search</span>
+            <div class="description">Advanced product search with filters</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/products/:id</span>
+            <div class="description">Get a specific product by ID with full details</div>
+            <div class="example">GET /api/products/123e4567-e89b-12d3-a456-426614174000</div>
+        </div>
+
+        <h2 id="categories">Categories</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/categories</span>
+            <div class="description">Get all product categories</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/categories/:slug</span>
+            <div class="description">Get a specific category by slug with products</div>
+            <div class="example">GET /api/categories/electronics</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/categories</span>
+            <span class="auth-required">Auth Required (Admin)</span>
+            <div class="description">Create a new category</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <span class="path">/api/categories/:slug</span>
+            <span class="auth-required">Auth Required (Admin)</span>
+            <div class="description">Update a category</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/categories/:slug</span>
+            <span class="auth-required">Auth Required (Admin)</span>
+            <div class="description">Delete a category</div>
+        </div>
+
+        <h2 id="cart">Shopping Cart</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/cart</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get user's cart items</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/cart</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Add item to cart</div>
+            <div class="example">POST /api/cart
+{
+  "product_id": "uuid",
+  "quantity": 2
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <span class="path">/api/cart/:id</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Update cart item quantity</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/cart/:id</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Remove item from cart</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/cart</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Clear entire cart</div>
+        </div>
+
+        <h2 id="orders">Orders</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/orders</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get user's order history</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/orders/:id</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get specific order details</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/orders</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Create a new order from cart</div>
+            <div class="example">POST /api/orders
+{
+  "shipping_address": {
+    "street": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zip": "10001",
+    "country": "USA"
+  },
+  "billing_address": { ... }
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <span class="path">/api/orders/:id/status</span>
+            <span class="auth-required">Auth Required (Admin)</span>
+            <div class="description">Update order status</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/orders/:id</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Cancel an order</div>
+        </div>
+
+        <h2 id="reviews">Reviews</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/reviews/product/:productId</span>
+            <div class="description">Get reviews for a specific product</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/reviews/user</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get current user's reviews</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/reviews/user/:productId</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get user's review for specific product</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/reviews</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Create a new review</div>
+            <div class="example">POST /api/reviews
+{
+  "product_id": "uuid",
+  "rating": 5,
+  "comment": "Excellent product!"
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <span class="path">/api/reviews/:id</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Update a review</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/reviews/:id</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Delete a review</div>
+        </div>
+
+        <h2 id="payments">Payments</h2>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/payments/intent</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Create Stripe payment intent</div>
+            <div class="example">POST /api/payments/intent
+{
+  "order_id": "uuid",
+  "amount": 9999
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/payments/confirm</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Confirm payment</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/payments/history</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get payment history</div>
+        </div>
+
+        <h2 id="wishlist">Wishlist</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/wishlist</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Get user's wishlist</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/wishlist</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Add item to wishlist</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/wishlist/:productId</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Remove item from wishlist</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/wishlist/:productId/check</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Check if product is in wishlist</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/wishlist</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Clear entire wishlist</div>
+        </div>
+
+        <h2 id="uploads">File Uploads</h2>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/api/uploads</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Upload image file (max 5MB, formats: jpg, png, gif, webp)</div>
+            <div class="example">POST /api/uploads
+Content-Type: multipart/form-data
+file: [image file]</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/api/uploads/:filename</span>
+            <div class="description">Serve uploaded image</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <span class="path">/api/uploads/:filename</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Delete uploaded image</div>
+        </div>
+
+        <h2 id="websocket">WebSocket</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/ws</span>
+            <div class="description">WebSocket connection for real-time updates</div>
+            <div class="example">ws://localhost:5000/ws</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/ws/users</span>
+            <div class="description">Get connected WebSocket users</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/ws/count</span>
+            <div class="description">Get WebSocket client count</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/notification</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send notification to WebSocket clients</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/order-update</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send order update notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/product-update</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send product update notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/stock-alert</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send stock alert notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/price-alert</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send price alert notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/new-product</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send new product notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/promotion</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send promotion notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/maintenance</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send maintenance notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/user-activity</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send user activity notification</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/analytics</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send analytics update</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/ws/stats</span>
+            <span class="auth-required">Auth Required</span>
+            <div class="description">Send real-time stats update</div>
+        </div>
+
+        <h2 id="admin">Admin Panel</h2>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin</span>
+            <div class="description">Admin dashboard interface</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/stats</span>
+            <div class="description">Get system statistics</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/logs</span>
+            <div class="description">Get system logs</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/metrics</span>
+            <div class="description">Get system metrics</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/database</span>
+            <div class="description">Get database statistics</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/cache</span>
+            <div class="description">Get cache statistics</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/users</span>
+            <div class="description">Get users list</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/products</span>
+            <div class="description">Get products list</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/orders</span>
+            <div class="description">Get orders list</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="path">/admin/api/health</span>
+            <div class="description">Get system health status</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/admin/api/seed</span>
+            <div class="description">Seed database with sample data</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/admin/api/migrate</span>
+            <div class="description">Run database migrations</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/admin/api/cache/clear</span>
+            <div class="description">Clear system cache</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="path">/admin/api/logs/clear</span>
+            <div class="description">Clear system logs</div>
+        </div>
+
+        <h2 id="response-format">Response Format</h2>
+        <p>All API responses follow a consistent format:</p>
+        <div class="example">{
+  "success": true,
+  "data": { ... },
+  "message": "Success message",
+  "timestamp": "2025-09-30T11:13:37Z"
+}</div>
+
+        <h2 id="error-handling">Error Handling</h2>
+        <p>Error responses include status codes and descriptive messages:</p>
+        <div class="example">{
+  "success": false,
+  "error": "Error message",
+  "code": "ERROR_CODE",
+  "details": { ... },
+  "timestamp": "2025-09-30T11:13:37Z"
+}</div>
+
+        <h3>Common HTTP Status Codes</h3>
+        <ul>
+            <li><strong>200 OK</strong> - Request successful</li>
+            <li><strong>201 Created</strong> - Resource created successfully</li>
+            <li><strong>400 Bad Request</strong> - Invalid request data</li>
+            <li><strong>401 Unauthorized</strong> - Authentication required</li>
+            <li><strong>403 Forbidden</strong> - Insufficient permissions</li>
+            <li><strong>404 Not Found</strong> - Resource not found</li>
+            <li><strong>409 Conflict</strong> - Resource already exists</li>
+            <li><strong>422 Unprocessable Entity</strong> - Validation error</li>
+            <li><strong>429 Too Many Requests</strong> - Rate limit exceeded</li>
+            <li><strong>500 Internal Server Error</strong> - Server error</li>
+        </ul>
+
+        <h2>Rate Limiting</h2>
+        <p>API requests are limited to 100 requests per minute per IP address. Rate limit headers are included in responses:</p>
+        <div class="example">X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1640995200</div>
+
+        <h2>Monitoring & Metrics</h2>
+        <p>API metrics and monitoring endpoints:</p>
+        <ul>
+            <li><strong>Health Check:</strong> <a href="/api/health">/api/health</a></li>
+            <li><strong>Prometheus Metrics:</strong> <a href="/api/metrics">/api/metrics</a></li>
+            <li><strong>Admin Dashboard:</strong> <a href="/admin">/admin</a></li>
+        </ul>
+
+        <h2>WebSocket Events</h2>
+        <p>Real-time events sent via WebSocket:</p>
+        <ul>
+            <li><strong>stats</strong> - System statistics update</li>
+            <li><strong>order_update</strong> - Order status change</li>
+            <li><strong>product_update</strong> - Product information change</li>
+            <li><strong>stock_alert</strong> - Low stock notification</li>
+            <li><strong>price_alert</strong> - Price change notification</li>
+            <li><strong>new_product</strong> - New product added</li>
+            <li><strong>promotion</strong> - Promotion announcement</li>
+            <li><strong>maintenance</strong> - System maintenance notice</li>
+        </ul>
+
+        <h2>Data Models</h2>
+        <h3>Product</h3>
+        <div class="example">{
+  "id": "uuid",
+  "name": "Product Name",
+  "slug": "product-name",
+  "description": "Product description",
+  "price": 99.99,
+  "compare_price": 129.99,
+  "images": ["image1.jpg", "image2.jpg"],
+  "in_stock": true,
+  "stock": 50,
+  "featured": false,
+  "category_id": "uuid",
+  "created_at": "2025-09-30T11:13:37Z",
+  "updated_at": "2025-09-30T11:13:37Z"
+}</div>
+
+        <h3>User</h3>
+        <div class="example">{
+  "id": "uuid",
+  "email": "user@example.com",
+  "name": "User Name",
+  "role": "user",
+  "image": "avatar.jpg",
+  "created_at": "2025-09-30T11:13:37Z",
+  "updated_at": "2025-09-30T11:13:37Z"
+}</div>
+
+        <h3>Order</h3>
+        <div class="example">{
+  "id": "uuid",
+  "user_id": "uuid",
+  "status": "pending",
+  "total": 199.98,
+  "subtotal": 199.98,
+  "tax": 0,
+  "shipping": 0,
+  "shipping_address": "{ ... }",
+  "billing_address": "{ ... }",
+  "payment_intent": "pi_...",
+  "created_at": "2025-09-30T11:13:37Z",
+  "updated_at": "2025-09-30T11:13:37Z"
+}</div>
+
+        <h2>Changelog</h2>
+        <h3>Version 2.0.0</h3>
+        <ul>
+            <li>Added comprehensive WebSocket support</li>
+            <li>Implemented admin panel with real-time monitoring</li>
+            <li>Added file upload functionality</li>
+            <li>Enhanced error handling and validation</li>
+            <li>Added rate limiting and security headers</li>
+            <li>Implemented caching system</li>
+            <li>Added metrics and monitoring endpoints</li>
+        </ul>
+
+        <h2>Support</h2>
+        <p>For API support and questions:</p>
+        <ul>
+            <li>Check the health endpoint for system status</li>
+            <li>Review error messages for troubleshooting</li>
+            <li>Monitor rate limits and adjust request frequency</li>
+            <li>Use the admin panel for system management</li>
+        </ul>
+    </div>
+</body>
+</html>

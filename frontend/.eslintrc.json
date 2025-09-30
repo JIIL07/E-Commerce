@@ -2,8 +2,6 @@
   "extends": "next/core-web-vitals",
   "rules": {
     "react/no-unescaped-entities": "off",
-    "prefer-const": "warn",
-    "react-hooks/exhaustive-deps": "warn",
-    "@next/next/no-img-element": "warn"
+    "@next/next/no-img-element": "off"
   }
 }

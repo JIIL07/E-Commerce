@@ -6,70 +6,105 @@ services:
     container_name: ecommerce-postgres
     environment:
       POSTGRES_DB: ${DB_NAME:-ecommerce}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "${DB_PORT:-5432}:5432"
+      POSTGRES_USER: ${DB_USER:-jiil}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-juice}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-jiil} -d ${DB_NAME:-ecommerce}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
     container_name: ecommerce-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: 
+    build:
       context: ./backend-go
       dockerfile: Dockerfile
+      target: runtime
+      cache_from:
+        - ecommerce-backend:latest
     container_name: ecommerce-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-jiil}
+      DB_PASSWORD: ${DB_PASSWORD:-juice}
+      DB_NAME: ${DB_NAME:-ecommerce}
+      DB_SSLMODE: disable
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      FRONTEND_URL: http://frontend:3000
+      GIN_MODE: ${GIN_MODE:-debug}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
-    environment:
-      - PORT=5000
-      - GIN_MODE=${GIN_MODE:-release}
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME:-ecommerce}
-      - DB_SSLMODE=${DB_SSLMODE:-disable}
-      - JWT_SECRET=${JWT_SECRET}
-      - FRONTEND_URL=http://frontend:3000
-      - REDIS_URL=redis:6379
     depends_on:
-      - postgres
-      - redis
-    volumes:
-      - ./backend-go/uploads:/root/uploads
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: runtime
+      cache_from:
+        - ecommerce-frontend:latest
     container_name: ecommerce-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000
+      NEXT_PUBLIC_APP_NAME: E-Commerce
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NODE_ENV: production
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:${BACKEND_PORT:-5000}
-      - NODE_ENV=${NODE_ENV:-production}
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   nginx:
     image: nginx:alpine
@@ -81,8 +116,49 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
-      - frontend
-      - backend
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ecommerce-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ecommerce-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
     networks:
       - ecommerce-network
     restart: unless-stopped
@@ -90,6 +166,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  grafana_data:
 
 networks:
   ecommerce-network:

@@ -1,11 +1,8 @@
-package models
-
+﻿package models
 import (
 	"time"
 )
-
 type OrderStatus string
-
 const (
 	OrderStatusPending    OrderStatus = "pending"
 	OrderStatusProcessing OrderStatus = "processing"
@@ -13,7 +10,6 @@ const (
 	OrderStatusDelivered  OrderStatus = "delivered"
 	OrderStatusCancelled  OrderStatus = "cancelled"
 )
-
 type Order struct {
 	ID              string      `json:"id" db:"id"`
 	UserID          string      `json:"user_id" db:"user_id"`
@@ -28,7 +24,6 @@ type Order struct {
 	CreatedAt       time.Time   `json:"created_at" db:"created_at"`
 	UpdatedAt       time.Time   `json:"updated_at" db:"updated_at"`
 }
-
 type OrderItem struct {
 	ID        string  `json:"id" db:"id"`
 	OrderID   string  `json:"order_id" db:"order_id"`
@@ -36,23 +31,19 @@ type OrderItem struct {
 	Quantity  int     `json:"quantity" db:"quantity"`
 	Price     float64 `json:"price" db:"price"`
 }
-
 type OrderWithItems struct {
 	Order
 	User      *UserResponse      `json:"user,omitempty"`
 	OrderItems []OrderItemWithProduct `json:"order_items,omitempty"`
 }
-
 type OrderItemWithProduct struct {
 	OrderItem
 	Product *ProductWithRating `json:"product,omitempty"`
 }
-
 type OrderCreateRequest struct {
 	ShippingAddress string `json:"shipping_address" binding:"required"`
 	BillingAddress  string `json:"billing_address" binding:"required"`
 }
-
 type OrderUpdateRequest struct {
 	Status *OrderStatus `json:"status"`
-}
+}

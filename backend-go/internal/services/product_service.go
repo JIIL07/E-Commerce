@@ -1,20 +1,16 @@
-package services
-
+﻿package services
 import (
 	"fmt"
 	"math"
 	"strings"
-
 	"ecommerce-backend/internal/models"
 	"ecommerce-backend/internal/repositories"
 )
-
 type ProductService struct {
 	productRepo *repositories.ProductRepository
 	categoryRepo *repositories.CategoryRepository
 	reviewRepo   *repositories.ReviewRepository
 }
-
 func NewProductService(productRepo *repositories.ProductRepository, categoryRepo *repositories.CategoryRepository, reviewRepo *repositories.ReviewRepository) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
@@ -22,7 +18,6 @@ func NewProductService(productRepo *repositories.ProductRepository, categoryRepo
 		reviewRepo:   reviewRepo,
 	}
 }
-
 func (s *ProductService) CreateProduct(req models.ProductCreateRequest) (*models.ProductWithCategory, error) {
 	product := &models.Product{
 		ID:          generateID(),
@@ -37,35 +32,28 @@ func (s *ProductService) CreateProduct(req models.ProductCreateRequest) (*models
 		Featured:    req.Featured,
 		CategoryID:  req.CategoryID,
 	}
-
 	if err := s.productRepo.Create(product); err != nil {
 		return nil, fmt.Errorf("failed to create product: %w", err)
 	}
-
 	return s.GetProductWithCategory(product.ID)
 }
-
 func (s *ProductService) GetProduct(id string) (*models.ProductWithCategory, error) {
 	return s.GetProductWithCategory(id)
 }
-
 func (s *ProductService) GetProductWithCategory(id string) (*models.ProductWithCategory, error) {
 	product, err := s.productRepo.GetByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("product not found: %w", err)
 	}
-
 	var category *models.Category
 	if product.CategoryID != "" {
 		category, _ = s.categoryRepo.GetByID(product.CategoryID)
 	}
-
 	return &models.ProductWithCategory{
 		Product:  *product,
 		Category: category,
 	}, nil
 }
-
 func (s *ProductService) GetProducts(query models.ProductQuery) (*models.PaginatedProducts, error) {
 	if query.Page <= 0 {
 		query.Page = 1
@@ -76,14 +64,11 @@ func (s *ProductService) GetProducts(query models.ProductQuery) (*models.Paginat
 	if query.Limit > 100 {
 		query.Limit = 100
 	}
-
 	offset := (query.Page - 1) * query.Limit
-
 	products, total, err := s.productRepo.ListWithFilters(query, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get products: %w", err)
 	}
-
 	productsWithRating := make([]models.ProductWithRating, len(products))
 	for i, product := range products {
 		rating, reviewCount := s.getProductRating(product.ID)
@@ -94,9 +79,7 @@ func (s *ProductService) GetProducts(query models.ProductQuery) (*models.Paginat
 			ReviewCount:   reviewCount,
 		}
 	}
-
 	pages := int(math.Ceil(float64(total) / float64(query.Limit)))
-
 	return &models.PaginatedProducts{
 		Data: productsWithRating,
 		Pagination: models.Pagination{
@@ -107,17 +90,14 @@ func (s *ProductService) GetProducts(query models.ProductQuery) (*models.Paginat
 		},
 	}, nil
 }
-
 func (s *ProductService) GetFeaturedProducts(limit int) ([]models.ProductWithRating, error) {
 	if limit <= 0 {
 		limit = 10
 	}
-
 	products, err := s.productRepo.GetFeatured(limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get featured products: %w", err)
 	}
-
 	productsWithRating := make([]models.ProductWithRating, len(products))
 	for i, product := range products {
 		rating, reviewCount := s.getProductRating(product.ID)
@@ -128,13 +108,10 @@ func (s *ProductService) GetFeaturedProducts(limit int) ([]models.ProductWithRat
 			ReviewCount:   reviewCount,
 		}
 	}
-
 	return productsWithRating, nil
 }
-
 func (s *ProductService) UpdateProduct(id string, req models.ProductUpdateRequest) (*models.ProductWithCategory, error) {
 	updates := make(map[string]interface{})
-
 	if req.Name != nil {
 		updates["name"] = *req.Name
 		updates["slug"] = generateSlug(*req.Name)
@@ -161,30 +138,24 @@ func (s *ProductService) UpdateProduct(id string, req models.ProductUpdateReques
 	if req.CategoryID != nil {
 		updates["category_id"] = *req.CategoryID
 	}
-
 	if len(updates) > 0 {
 		if err := s.productRepo.Update(id, updates); err != nil {
 			return nil, fmt.Errorf("failed to update product: %w", err)
 		}
 	}
-
 	return s.GetProductWithCategory(id)
 }
-
 func (s *ProductService) DeleteProduct(id string) error {
 	return s.productRepo.Delete(id)
 }
-
 func (s *ProductService) SearchProducts(query string, limit int) ([]models.ProductWithRating, error) {
 	if limit <= 0 {
 		limit = 20
 	}
-
 	products, err := s.productRepo.Search(query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to search products: %w", err)
 	}
-
 	productsWithRating := make([]models.ProductWithRating, len(products))
 	for i, product := range products {
 		rating, reviewCount := s.getProductRating(product.ID)
@@ -195,10 +166,8 @@ func (s *ProductService) SearchProducts(query string, limit int) ([]models.Produ
 			ReviewCount:   reviewCount,
 		}
 	}
-
 	return productsWithRating, nil
 }
-
 func (s *ProductService) getProductRating(productID string) (float64, int) {
 	rating, count, err := s.reviewRepo.GetProductRating(productID)
 	if err != nil {
@@ -206,10 +175,9 @@ func (s *ProductService) getProductRating(productID string) (float64, int) {
 	}
 	return rating, count
 }
-
 func generateSlug(name string) string {
 	slug := strings.ToLower(name)
 	slug = strings.ReplaceAll(slug, " ", "-")
 	slug = strings.ReplaceAll(slug, "_", "-")
 	return slug
-}
+}

@@ -1,9 +1,7 @@
-package models
-
+﻿package models
 import (
 	"time"
 )
-
 type Product struct {
 	ID           string    `json:"id" db:"id"`
 	Name         string    `json:"name" db:"name"`
@@ -19,19 +17,16 @@ type Product struct {
 	CreatedAt    time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
 }
-
 type ProductWithCategory struct {
 	Product
 	Category *Category `json:"category,omitempty"`
 }
-
 type ProductWithRating struct {
 	Product
 	Category      *Category `json:"category,omitempty"`
 	AverageRating float64   `json:"average_rating"`
 	ReviewCount   int       `json:"review_count"`
 }
-
 type ProductCreateRequest struct {
 	Name         string   `json:"name" binding:"required"`
 	Description  string   `json:"description"`
@@ -42,7 +37,6 @@ type ProductCreateRequest struct {
 	Featured     bool     `json:"featured"`
 	CategoryID   string   `json:"category_id" binding:"required"`
 }
-
 type ProductUpdateRequest struct {
 	Name         *string  `json:"name"`
 	Description  *string  `json:"description"`
@@ -53,7 +47,6 @@ type ProductUpdateRequest struct {
 	Featured     *bool    `json:"featured"`
 	CategoryID   *string  `json:"category_id"`
 }
-
 type ProductQuery struct {
 	Page      int    `form:"page"`
 	Limit     int    `form:"limit"`
@@ -63,15 +56,13 @@ type ProductQuery struct {
 	SortBy    string `form:"sort_by"`
 	SortOrder string `form:"sort_order"`
 }
-
 type PaginatedProducts struct {
 	Data       []ProductWithRating `json:"data"`
 	Pagination Pagination          `json:"pagination"`
 }
-
 type Pagination struct {
 	Page  int `json:"page"`
 	Limit int `json:"limit"`
 	Total int `json:"total"`
 	Pages int `json:"pages"`
-}
+}

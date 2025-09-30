@@ -97,12 +97,22 @@ CREATE TABLE IF NOT EXISTS reviews (
     UNIQUE(user_id, product_id)
 );
 
+-- Create wishlist_items table
+CREATE TABLE IF NOT EXISTS wishlist_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, product_id)
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_featured ON products(featured);
 CREATE INDEX IF NOT EXISTS idx_products_in_stock ON products(in_stock);
 CREATE INDEX IF NOT EXISTS idx_cart_items_user_id ON cart_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_wishlist_items_user_id ON wishlist_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_wishlist_items_product_id ON wishlist_items(product_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);

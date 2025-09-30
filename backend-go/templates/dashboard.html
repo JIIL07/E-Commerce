@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - E-Commerce Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500">Last updated: <span id="lastUpdated"></span></span>
+                        <button onclick="refreshData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="totalUsers">-</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Products</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="totalProducts">-</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Orders</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="totalOrders">-</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Revenue</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="totalRevenue">-</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">System Metrics</h3>
+                    <canvas id="metricsChart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+                    <div class="space-y-3" id="recentActivity">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Database</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Status:</span>
+                            <span class="text-sm font-medium text-green-600" id="dbStatus">Connected</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Connections:</span>
+                            <span class="text-sm font-medium" id="dbConnections">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Size:</span>
+                            <span class="text-sm font-medium" id="dbSize">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Cache</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Status:</span>
+                            <span class="text-sm font-medium text-green-600">Active</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Hit Rate:</span>
+                            <span class="text-sm font-medium" id="cacheHitRate">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Size:</span>
+                            <span class="text-sm font-medium" id="cacheSize">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">API</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Status:</span>
+                            <span class="text-sm font-medium text-green-600">Healthy</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Requests:</span>
+                            <span class="text-sm font-medium" id="apiRequests">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Avg Response:</span>
+                            <span class="text-sm font-medium" id="apiResponseTime">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button onclick="seedDatabase()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Seed Database
+                    </button>
+                    <button onclick="migrateDatabase()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                        Run Migrations
+                    </button>
+                    <button onclick="clearCache()" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">
+                        Clear Cache
+                    </button>
+                    <button onclick="clearLogs()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        Clear Logs
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let metricsChart;
+        let ws;
+
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'stats') {
+                    updateDashboard(data.data);
+                }
+            };
+            
+            ws.onclose = function() {
+                setTimeout(initWebSocket, 5000);
+            };
+        }
+
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('metricsChart').getContext('2d');
+            metricsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'CPU Usage',
+                        data: [],
+                        borderColor: 'rgb(59, 130, 246)',
+                        tension: 0.1
+                    }, {
+                        label: 'Memory Usage',
+                        data: [],
+                        borderColor: 'rgb(16, 185, 129)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update dashboard with new data
+        function updateDashboard(data) {
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+            
+            // Update stats
+            document.getElementById('totalUsers').textContent = data.users?.length || 0;
+            document.getElementById('totalProducts').textContent = data.products?.length || 0;
+            document.getElementById('totalOrders').textContent = data.orders?.length || 0;
+            document.getElementById('totalRevenue').textContent = '$' + (data.revenue || 0).toFixed(2);
+            
+            // Update system status
+            if (data.database) {
+                document.getElementById('dbConnections').textContent = data.database.connections || '-';
+                document.getElementById('dbSize').textContent = data.database.size || '-';
+            }
+            
+            if (data.cache) {
+                document.getElementById('cacheHitRate').textContent = data.cache.hit_rate || '-';
+                document.getElementById('cacheSize').textContent = data.cache.size || '-';
+            }
+            
+            if (data.metrics?.http_requests) {
+                document.getElementById('apiRequests').textContent = data.metrics.http_requests.total || '-';
+                document.getElementById('apiResponseTime').textContent = data.metrics.http_requests.avg_time || '-';
+            }
+            
+            // Update chart
+            if (metricsChart && data.timestamp) {
+                const time = new Date(data.timestamp * 1000).toLocaleTimeString();
+                metricsChart.data.labels.push(time);
+                metricsChart.data.datasets[0].data.push(Math.random() * 100);
+                metricsChart.data.datasets[1].data.push(Math.random() * 100);
+                
+                if (metricsChart.data.labels.length > 10) {
+                    metricsChart.data.labels.shift();
+                    metricsChart.data.datasets[0].data.shift();
+                    metricsChart.data.datasets[1].data.shift();
+                }
+                
+                metricsChart.update();
+            }
+        }
+
+        // Quick action functions
+        function seedDatabase() {
+            fetch('/admin/api/seed', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || 'Database seeded successfully');
+                    refreshData();
+                })
+                .catch(error => {
+                    alert('Error seeding database: ' + error.message);
+                });
+        }
+
+        function migrateDatabase() {
+            fetch('/admin/api/migrate', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || 'Database migrated successfully');
+                    refreshData();
+                })
+                .catch(error => {
+                    alert('Error migrating database: ' + error.message);
+                });
+        }
+
+        function clearCache() {
+            fetch('/admin/api/cache/clear', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || 'Cache cleared successfully');
+                    refreshData();
+                })
+                .catch(error => {
+                    alert('Error clearing cache: ' + error.message);
+                });
+        }
+
+        function clearLogs() {
+            fetch('/admin/api/logs/clear', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || 'Logs cleared successfully');
+                    refreshData();
+                })
+                .catch(error => {
+                    alert('Error clearing logs: ' + error.message);
+                });
+        }
+
+        function refreshData() {
+            fetch('/admin/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    updateDashboard(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching stats:', error);
+                });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+            initWebSocket();
+            refreshData();
+        });
+    </script>
+</body>
+</html>

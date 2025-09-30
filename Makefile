@@ -1,90 +1,129 @@
-# Project Management
-.PHONY: help setup build up down logs clean restart migrate-up migrate-down
+.PHONY: help dev dev-down build build-fast setup migrate test clean final init seed generate-images
 
 help:
 	@echo "Available commands:"
-	@echo "  setup     - Initial project setup"
-	@echo "  build     - Build all Docker images"
-	@echo "  up        - Start all services"
-	@echo "  down      - Stop all services"
-	@echo "  logs      - View logs from all services"
-	@echo "  clean     - Clean up containers and volumes"
-	@echo "  restart   - Restart all services"
-	@echo "  migrate-up   - Run database migrations"
-	@echo "  migrate-down - Rollback database migrations"
+	@echo "  dev        - Start development environment (fast, no monitoring)"
+	@echo "  final      - Start final optimized environment (fast with monitoring)"
+	@echo "  dev-down   - Stop development environment"
+	@echo "  build      - Build Docker images (no cache)"
+	@echo "  build-fast - Build Docker images (with cache)"
+	@echo "  setup      - Setup project directories"
+	@echo "  init       - Initialize database and run migrations"
+	@echo "  migrate    - Run database migrations"
+	@echo "  seed       - Seed database with all sample data"
+	@echo "  seed-categories - Seed only categories"
+	@echo "  seed-products   - Seed only products"
+	@echo "  seed-users      - Seed only users"
+	@echo "  seed-orders     - Seed only orders"
+	@echo "  seed-reviews    - Seed only reviews"
+	@echo "  generate-images - Generate placeholder images for products"
+	@echo "  auto-init   - Full project setup (init + seed + images)"
+	@echo "  start-full  - Build, start services and auto-initialize"
+	@echo "  test       - Run tests"
+	@echo "  clean      - Clean up containers and volumes"
+
+dev:
+	@echo "Starting development environment..."
+	@echo "Building images in parallel..."
+	docker-compose build --parallel
+	@echo "Starting services..."
+	docker-compose up -d
+	@echo "Development environment started!"
+	@echo "Frontend: http://localhost:3000"
+	@echo "Backend API: http://localhost:5000"
+	@echo "API Docs: http://localhost:5000/docs"
+
+final:
+	@echo "Starting final optimized environment with multi-stage builds..."
+	@echo "Building images with cache optimization..."
+	docker-compose build --parallel
+	@echo "Starting services..."
+	docker-compose up -d
+	@echo "Final environment started!"
+	@echo "Frontend: http://localhost:3000"
+	@echo "Backend API: http://localhost:5000"
+	@echo "API Docs: http://localhost:5000/docs"
+	@echo "Prometheus: http://localhost:9090"
+	@echo "Grafana: http://localhost:3001 (admin/admin)"
+
+dev-down:
+	docker-compose down
+
+build:
+	@echo "Building optimized Docker images with multi-stage builds..."
+	docker-compose build --parallel --no-cache
+
+build-fast:
+	@echo "Building Docker images with cache optimization..."
+	docker-compose build --parallel
 
 setup:
 	@echo "Setting up E-Commerce project..."
+ifeq ($(OS),Windows_NT)
+	@if not exist .env ( \
+		echo Creating .env file from template... && \
+		copy env.example .env && \
+		echo Please edit .env file with your configuration \
+	)
+	@if not exist logs mkdir logs
+	@if not exist logs\backend mkdir logs\backend
+	@if not exist logs\nginx mkdir logs\nginx
+	@if not exist logs\frontend mkdir logs\frontend
+	@if not exist backend-go\uploads mkdir backend-go\uploads
+	@if not exist nginx\ssl mkdir nginx\ssl
+else
 	@if [ ! -f .env ]; then \
+		echo "Creating .env file from template..."; \
 		cp env.example .env; \
-		echo "Created .env file from template. Please edit it with your configuration."; \
+		echo "Please edit .env file with your configuration"; \
 	fi
-	@echo "Setup complete! Edit .env file and run 'make up' to start."
+	@mkdir -p logs/backend logs/nginx logs/frontend
+	@mkdir -p backend-go/uploads
+	@mkdir -p nginx/ssl
+	@chmod +x scripts/*.sh
+endif
+	@echo "Setup completed!"
 
-build:
-	@echo "Building all Docker images..."
-	docker-compose build
+init:
+	@echo "Initializing database..."
+	cd backend-go && go run cmd/main.go -mode=init -wait
 
-up:
-	@echo "Starting all services..."
-	docker-compose up -d
-	@echo "Services started! Access the application at http://localhost"
+migrate:
+	docker-compose exec backend ./main -mode=init
 
-down:
-	@echo "Stopping all services..."
-	docker-compose down
+seed:
+	@echo "Seeding database with all sample data..."
+	cd backend-go && go run cmd/main.go -mode=seed
 
-logs:
-	docker-compose logs -f
+generate-images:
+	@echo "Generating placeholder images for products..."
+	cd backend-go && go run cmd/main.go -mode=generate-images
+	@echo "Placeholder images generated successfully!"
+	@echo "Images are available at: http://localhost:5000/api/uploads/"
+
+auto-init:
+	@echo "Auto-initializing E-Commerce project..."
+	@echo "This will: initialize DB, seed data, and generate placeholder images"
+	cd backend-go && go run cmd/main.go -mode=auto-init -wait
+	@echo "Project ready! Visit http://localhost:3000"
+
+start-full:
+	@echo "Starting E-Commerce with full initialization..."
+	@echo "Building and starting services..."
+	docker-compose up -d --build
+	@echo "Waiting for services to be ready..."
+	timeout /t 10 /nobreak >nul 2>&1 || sleep 10
+	@echo "Running auto-initialization..."
+	cd backend-go && go run cmd/main.go -mode=auto-init -wait
+	@echo "E-Commerce is ready!"
+	@echo "Frontend: http://localhost:3000"
+	@echo "Backend: http://localhost:5000"
+	@echo "Admin: http://localhost:5000/admin"
+
+test:
+	@echo "Running tests..."
+	cd backend-go && go test ./...
 
 clean:
-	@echo "Cleaning up containers and volumes..."
 	docker-compose down -v --remove-orphans
 	docker system prune -f
-
-restart:
-	@echo "Restarting all services..."
-	docker-compose restart
-
-migrate-up:
-	@echo "Running database migrations..."
-	docker-compose exec backend go run ./cmd/server migrate-up
-
-migrate-down:
-	@echo "Rolling back database migrations..."
-	docker-compose exec backend go run ./cmd/server migrate-down
-
-# Development commands
-dev-backend:
-	@echo "Starting backend in development mode..."
-	cd backend-go && make dev
-
-dev-frontend:
-	@echo "Starting frontend in development mode..."
-	cd frontend && npm run dev
-
-# Production commands
-prod-build:
-	@echo "Building for production..."
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
-
-prod-up:
-	@echo "Starting production services..."
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-
-# Database commands
-db-shell:
-	docker-compose exec postgres psql -U postgres -d ecommerce
-
-db-backup:
-	@echo "Creating database backup..."
-	docker-compose exec postgres pg_dump -U postgres ecommerce > backup_$(shell date +%Y%m%d_%H%M%S).sql
-
-# Monitoring
-status:
-	@echo "Service status:"
-	docker-compose ps
-
-health:
-	@echo "Health check:"
-	@curl -s http://localhost/api/health | jq . || echo "Health check failed"

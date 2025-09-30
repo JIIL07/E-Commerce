@@ -1,45 +1,84 @@
-# Environment variables
 .env
 .env.local
 .env.production
 .env.staging
-.env.development
 
-# Dependencies
-node_modules/
-vendor/
-
-# Build outputs
-dist/
-build/
-.next/
-out/
-
-# Logs
-*.log
 logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
 coverage/
+*.lcov
+
 .nyc_output
 
-# IDE files
+# Dependency directories
+node_modules/
+jspm_packages/
+
+.npm
+
+.eslintcache
+
+.node_repl_history
+
+*.tgz
+
+
+.yarn-integrity
+
+.cache
+.parcel-cache
+
+.next
+out
+
+.nuxt
+dist
+
+.vuepress/dist
+
+.serverless
+
+
+.fusebox/
+
+.dynamodb/
+
+.tern-port
+
+.vscode-test
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+.cache/
+
+go-test-cache/
+
+coverage.out
+coverage.html
+
+
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -48,34 +87,25 @@ coverage/
 ehthumbs.db
 Thumbs.db
 
-# Database
+.dockerignore
+
 *.db
 *.sqlite
 *.sqlite3
 
-# Uploads
 uploads/
-frontend/uploads/
 backend-go/uploads/
 
-# SSL certificates
 nginx/ssl/
 *.pem
 *.key
 *.crt
 
-# Docker
-.dockerignore
+*.bak
+*.backup
+database/backups/
 
-# Go specific
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-*.test
-*.out
-
-# Temporary files
 tmp/
 temp/
+
+ULTIMATE_GUIDE.md

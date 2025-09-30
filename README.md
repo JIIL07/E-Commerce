@@ -1,259 +1,330 @@
-# E-Commerce Platform
+# 🚀 E-Commerce
 
-Полнофункциональная e-commerce платформа с современным frontend на Next.js и высокопроизводительным backend на Go.
+<div align="center">
 
-## 🚀 Быстрый старт
+![E-Commerce Platform](https://img.shields.io/badge/E--Commerce-Platform-blue?style=for-the-badge&logo=shopping-cart)
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Go](https://img.shields.io/badge/Go-1.23-blue?style=for-the-badge&logo=go)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=for-the-badge&logo=docker)
+![Template](https://img.shields.io/badge/Template-For_Developers-green?style=for-the-badge&logo=code)
 
-### Одна команда для запуска всего:
+**Complete E-Commerce - ready-to-customize template for developers**
+[![Documentation](https://img.shields.io/badge/📚_Documentation-Read_More-blue?style=for-the-badge)](#-documentation)
+[![Get Started](https://img.shields.io/badge/⚡_Get_Started-5_Minutes-orange?style=for-the-badge)](#quick-start)
 
-```bash
-make setup && make up
-```
-
-## 📋 Что включено
-
-- **Frontend**: Next.js 14 с современным UI/UX
-- **Backend**: Go + Gin с PostgreSQL
-- **База данных**: PostgreSQL 15
-- **Кэш**: Redis 7
-- **Прокси**: Nginx
-- **Контейнеризация**: Docker + Docker Compose
-
-## 🛠️ Установка
-
-### 1. Клонирование и настройка
-
-```bash
-git clone <repository-url>
-cd E-Commerce
-make setup
-```
-
-### 2. Настройка переменных окружения
-
-Отредактируйте файл `.env`:
-
-```bash
-# Обязательные настройки
-DB_PASSWORD=your-super-secure-password
-JWT_SECRET=your-super-secret-jwt-key
-
-# Опциональные настройки
-BACKEND_PORT=5000
-FRONTEND_PORT=3000
-HTTP_PORT=80
-```
-
-### 3. Запуск
-
-```bash
-# Запуск всех сервисов
-make up
-
-# Или пошагово
-make build
-docker-compose up -d
-```
-
-## 🌐 Доступ к приложению
-
-- **Frontend**: http://localhost
-- **Backend API**: http://localhost/api
-- **Health Check**: http://localhost/health
-
-## 📊 Управление
-
-### Основные команды
-
-```bash
-make up          # Запуск всех сервисов
-make down        # Остановка всех сервисов
-make restart     # Перезапуск
-make logs        # Просмотр логов
-make status      # Статус сервисов
-make clean       # Очистка (удаляет данные!)
-```
-
-### Разработка
-
-```bash
-make dev-backend   # Backend в режиме разработки
-make dev-frontend  # Frontend в режиме разработки
-```
-
-### База данных
-
-```bash
-make migrate-up    # Применить миграции
-make migrate-down  # Откатить миграции
-make db-shell      # Подключиться к БД
-make db-backup     # Создать бэкап
-```
-
-## 🔒 Безопасность
-
-### Что защищено:
-
-- ✅ Все пароли в переменных окружения
-- ✅ JWT секреты не в коде
-- ✅ SSL/TLS для продакшена
-- ✅ Security headers
-- ✅ CORS настройки
-- ✅ .env файлы в .gitignore
-
-### Для продакшена:
-
-1. **Измените все пароли** в `.env`
-2. **Используйте HTTPS** (SSL сертификаты)
-3. **Настройте firewall**
-4. **Регулярно обновляйте** зависимости
-
-## 🏗️ Архитектура
-
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Nginx     │────│  Frontend   │────│   Backend   │
-│  (Port 80)  │    │ (Next.js)   │    │    (Go)     │
-└─────────────┘    └─────────────┘    └─────────────┘
-                           │                   │
-                           │                   │
-                    ┌─────────────┐    ┌─────────────┐
-                    │   Redis     │    │ PostgreSQL  │
-                    │   (Cache)   │    │ (Database)  │
-                    └─────────────┘    └─────────────┘
-```
-
-## 📁 Структура проекта
-
-```
-E-Commerce/
-├── frontend/           # Next.js приложение
-├── backend-go/         # Go API сервер
-├── nginx/             # Nginx конфигурация
-├── scripts/           # Утилиты и скрипты
-├── docker-compose.yml # Основная конфигурация
-├── docker-compose.prod.yml # Продакшен конфигурация
-├── Makefile          # Команды управления
-└── README.md         # Документация
-```
-
-## 🔧 Конфигурация
-
-### Переменные окружения
-
-| Переменная | Описание | По умолчанию |
-|------------|----------|--------------|
-| `DB_PASSWORD` | Пароль БД | **Обязательно** |
-| `JWT_SECRET` | JWT секрет | **Обязательно** |
-| `BACKEND_PORT` | Порт backend | `5000` |
-| `FRONTEND_PORT` | Порт frontend | `3000` |
-| `HTTP_PORT` | Порт nginx | `80` |
-
-### Порты
-
-- **80**: Nginx (основной доступ)
-- **3000**: Frontend (прямой доступ)
-- **5000**: Backend API (прямой доступ)
-- **5432**: PostgreSQL
-- **6379**: Redis
-
-## 🚀 Продакшен
-
-### 1. Подготовка
-
-```bash
-# Настройте продакшен переменные
-cp env.example .env
-# Отредактируйте .env с продакшен настройками
-
-# Сгенерируйте SSL сертификаты
-chmod +x scripts/generate-ssl.sh
-./scripts/generate-ssl.sh
-```
-
-### 2. Запуск
-
-```bash
-make prod-build
-make prod-up
-```
-
-### 3. Мониторинг
-
-```bash
-make status    # Статус сервисов
-make logs      # Логи
-make health    # Проверка здоровья
-```
-
-## 🐛 Отладка
-
-### Просмотр логов
-
-```bash
-# Все сервисы
-make logs
-
-# Конкретный сервис
-docker-compose logs -f backend
-docker-compose logs -f frontend
-```
-
-### Подключение к контейнерам
-
-```bash
-# Backend
-docker-compose exec backend sh
-
-# Frontend
-docker-compose exec frontend sh
-
-# База данных
-make db-shell
-```
-
-### Очистка
-
-```bash
-make clean  # Удаляет ВСЕ данные!
-```
-
-## 📈 Производительность
-
-- **Go backend**: Высокая производительность и низкое потребление памяти
-- **Next.js frontend**: SSR и оптимизация
-- **PostgreSQL**: Индексированная БД
-- **Redis**: Кэширование
-- **Nginx**: Обратный прокси и сжатие
-
-## 🤝 Разработка
-
-### Добавление новых функций
-
-1. **Backend**: Добавьте handlers в `backend-go/internal/handlers/`
-2. **Frontend**: Добавьте компоненты в `frontend/components/`
-3. **База данных**: Создайте миграции в `backend-go/migrations/`
-
-### Тестирование
-
-```bash
-# Backend тесты
-cd backend-go && make test
-
-# Frontend тесты
-cd frontend && npm test
-```
-
-## 📄 Лицензия
-
-MIT License
-
-## 🆘 Поддержка
-
-- Создайте issue в репозитории
-- Проверьте логи: `make logs`
-- Проверьте статус: `make status`
+</div>
 
 ---
 
-**Готово к использованию!** 🎉
+## ✨ Why This Skeleton?
+
+### 🎯 **Ready-to-Customize Template**
+- **Full-featured backend API** out of the box
+- **Clean architecture** with layered separation
+- **Pre-built data models** for E-Commerce
+- **Smart image system** with automatic placeholders
+- **Admin panel** for easy management
+- **Well-documented code** for easy understanding
+
+### ⚡ **High Performance**
+- **Microservice architecture** for scalability
+- **Optimized database queries**
+- **Middleware** for logging and monitoring
+- **WebSocket** support for real-time features
+- **Image optimization** with Next.js Image component
+- **Caching system** with Redis integration
+
+### 🔒 **Security & Reliability**
+- **JWT authentication** with refresh tokens
+- **CORS** configuration
+- **Rate limiting** DDoS protection
+- **Data validation** at all levels
+- **Secure file uploads** with type validation
+- **Error handling** with graceful fallbacks
+
+### 💳 **Payment System**
+- **Stripe integration** ready to configure
+- **Webhook handling** for synchronization
+- **Multi-currency** support
+- **Automatic refunds** and reimbursements
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+graph TB
+    A[👤 User] --> B[🌐 Nginx Proxy]
+    B --> C[⚛️ Next.js Frontend]
+    B --> D[🔧 Go Backend API]
+    D --> E[🐘 PostgreSQL Database]
+    D --> F[⚡ Redis Cache]
+    D --> G[💳 Stripe Payment]
+    H[📊 Prometheus] --> D
+    I[📈 Grafana] --> H
+```
+
+### 🎨 **Frontend (Next.js 14)**
+- **App Router** with Server Components
+- **Tailwind CSS** for styling
+- **TypeScript** for type safety
+- **Ready-to-customize skeleton** for rapid development
+
+### 🔧 **Backend (Go + Gin)**
+- **RESTful API** with full documentation
+- **Middleware** for authentication and logging
+- **Repository Pattern** for data access
+- **WebSocket** for real-time notifications
+
+### 🗄️ **Database (PostgreSQL)**
+- **Normalized schema** for data integrity
+- **Indexes** for fast queries
+- **Migrations** for schema versioning
+- **Backup** and recovery
+
+---
+
+## 🚀 Quick Start
+
+### 📋 Requirements
+- **Docker** 20.10+
+- **Docker Compose** 2.0+
+- **Make** (optional)
+
+### ⚡ Launch in 1 command
+
+```bash
+git clone https://github.com/JIIL07/E-Commerce
+cd E-Commerce
+
+make start-full
+```
+
+**Or step by step:**
+
+```bash
+make setup
+make dev
+make auto-init
+```
+
+### 🌐 Access to services
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **API Documentation**: http://localhost:5000/docs (Swagger)
+- **Admin Panel**: http://localhost:5000/admin
+- **Nginx**: http://localhost:80
+- **Grafana**: http://localhost:3001
+- **Prometheus**: http://localhost:9090
+
+---
+
+## 👨‍💻 For Developers
+
+### 🎯 **What You Get**
+This skeleton provides you with a **complete E-Commerce platform** with backend and frontend that you can:
+
+- **Customize to your needs** - change design, add new features
+- **Launch quickly** - ready-to-work online store out of the box
+- **Scale easily** - add microservices, caching, queues
+- **Customize business logic** - modify workflows, add new payment systems
+
+### 🚀 **Development Quick Start**
+
+1. **Explore the platform**:
+- Open http://localhost:3000 for frontend
+- Open http://localhost:5000/docs for API documentation
+- Open http://localhost:5000/admin for admin panel
+- Test endpoints with Postman/Insomnia
+
+2. **Customize for yourself**:
+- Change design in `frontend/src/`
+- Modify models in `backend-go/internal/models/`
+- Add new endpoints in `backend-go/internal/handlers/`
+- Configure business logic in `backend-go/internal/services/`
+- Upload images through `/api/uploads`
+- Manage products via admin panel at `/admin`
+
+### 📁 **Project Structure**
+```
+├── backend-go/       # Go Backend API
+│   ├── internal/
+│   │   ├── handlers/     # HTTP handlers (controllers)
+│   │   ├── services/     # Business logic
+│   │   ├── repositories/ # Database access
+│   │   ├── models/       # Data models
+│   │   ├── middleware/   # Middleware (auth, cors, logging)
+│   │   ├── utils/        # Utilities (JWT, validation)
+│   │   ├── websocket/    # WebSocket system
+│   │   └── seeds/        # Database seeding
+│   ├── migrations/       # SQL migrations
+│   ├── uploads/          # Uploaded files
+│   ├── scripts/          # Utility scripts
+│   └── templates/        # HTML templates
+├── frontend/         # Next.js Frontend
+│   ├── src/
+│   │   ├── app/         # App Router pages
+│   │   ├── components/  # React components
+│   │   ├── lib/         # Utilities and API client
+│   │   └── hooks/       # Custom hooks
+│   └── public/          # Static files
+├── nginx/            # Nginx configuration
+├── monitoring/       # Prometheus + Grafana
+└── docker-compose.yml # Service orchestration
+```
+
+### 🔧 **Key Features**
+- ✅ **Authentication** - JWT tokens, registration, login
+- ✅ **Products** - CRUD operations, categories, search
+- ✅ **Shopping Cart** - add/remove products
+- ✅ **Orders** - creation, tracking, history
+- ✅ **Payments** - Stripe integration
+- ✅ **Reviews** - rating and comment system
+- ✅ **Wishlist** - favorites functionality
+- ✅ **WebSocket** - real-time notifications
+- ✅ **Image System** - upload, storage, placeholder fallbacks
+- ✅ **Admin Panel** - comprehensive management interface
+- ✅ **Monitoring** - Prometheus + Grafana
+
+---
+
+## 🛠️ Main Commands
+
+```bash
+# Development
+make dev              # Start in development mode
+make build            # Build all services
+make test             # Run tests
+
+# Database & Seeding
+make init             # Initialize database
+make seed             # Seed with test data
+make generate-images  # Generate placeholder images
+
+# Production
+make prod             # Start in production mode
+make deploy           # Deploy to server
+make backup           # Backup database
+
+# Utilities
+make logs             # View logs
+make health           # Check service health
+make clean            # Clean containers
+```
+
+---
+
+## 🖼️ Image System
+
+### **Smart Image Handling**
+- **Automatic placeholders** for missing product images
+- **Fallback system** with graceful error handling
+- **Multiple image formats** support (JPEG, PNG, GIF, WebP)
+- **Optimized delivery** through Next.js Image component
+
+### **Features**
+- ✅ **Upload system** - secure file upload with validation
+- ✅ **Placeholder generation** - automatic creation for seed data
+- ✅ **Error handling** - graceful fallbacks for broken images
+- ✅ **Responsive images** - different sizes for different components
+- ✅ **CDN ready** - easy integration with external image services
+
+### **Quick Setup**
+```bash
+# Generate placeholder images for all products
+make generate-images
+
+# Images will be available at:
+# http://localhost:5000/api/uploads/filename.jpg
+```
+
+---
+
+## 📊 Monitoring & Analytics
+
+### 📈 **Built-in Analytics**
+- **Prometheus** for metrics collection
+- **Grafana** for visualization
+- **Health checks** for all services
+- **Real-time performance monitoring**
+
+### 📋 **Metrics**
+- API response time
+- Resource usage
+- Request count
+- Errors and exceptions
+
+---
+
+### 🐳 **Docker Deployment**
+```bash
+docker compose up -d
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### **Common Issues & Solutions**
+
+#### **Products showing without images**
+```bash
+# Solution: Generate placeholder images
+make generate-images
+```
+
+#### **Database connection issues**
+```bash
+# Check if PostgreSQL is running
+docker-compose ps postgres
+
+# Restart database
+docker-compose restart postgres
+```
+
+#### **WebSocket not working**
+```bash
+# Check WebSocket endpoint
+curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" http://localhost:5000/ws
+```
+
+#### **Frontend not loading**
+```bash
+# Rebuild frontend
+make build
+docker-compose restart frontend
+```
+
+### **Getting Help**
+- Check the [ULTIMATE_GUIDE.md](ULTIMATE_GUIDE.md) for detailed documentation
+- Review logs: `make logs`
+- Check service health: `make health`
+
+---
+
+## 🤝 Support & Community
+
+### 💬 **Get Help**
+- **GitHub Issues** for bugs and suggestions
+
+### 📚 **Documentation**
+- **[ULTIMATE_GUIDE.md](ULTIMATE_GUIDE.md)** - Complete developer guide
+- **API Documentation** - Swagger UI available at `/docs`
+- **Code Documentation** - detailed comments in code
+- **Database Schema** - migrations in `migrations/` folder
+- **Image System** - upload, storage, and placeholder handling
+
+---
+
+**⭐ Give us a star if you like the project!**
+
+---
+
+<div align="center">
+
+**Created with ❤️ for E-Commerce developers**
+
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=flat&logo=github)](https://github.com/JIIL07/E-Commerce)
+
+</div>
